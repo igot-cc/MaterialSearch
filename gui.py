@@ -1,15 +1,17 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog
 import main, search_in_sh as sc
 import os
-
 
 class My_gui(Frame):
     def __init__(self, master=None):
         super().__init__(master)
         # self.master = master
         # self.pack()
+
+        self.image_file = PhotoImage(file='D:/search/file.png')
 
         # # 菜单栏
         # self.menubar = Menu(master)
@@ -37,7 +39,6 @@ class My_gui(Frame):
         # 锚点
         # self.sizegrip = ttk.Sizegrip(self.status_frame).pack(anchor=NE)
 
-
         # 窗口
         self.panedwin_top = PanedWindow(self.panedwin, orient=VERTICAL, sashrelief=SUNKEN)
         self.panedwin_bottom = PanedWindow(self.panedwin, orient=HORIZONTAL, sashrelief=SUNKEN)
@@ -53,59 +54,70 @@ class My_gui(Frame):
         self.panedwin_bottom.add(self.right_frame)
 
         # label、Entry、Button
-        self.label1 = ttk.Label(self.top_frame, text='A002物料表地址：')
-        self.entry1 = ttk.Entry(self.top_frame, width=30)
-        self.entry1.insert(0, 'D:\\')
-        self.label2 = ttk.Label(self.top_frame, text='A002物料表名称：')
-        self.entry2 = ttk.Entry(self.top_frame, width=20)
-        self.entry2.insert(0, 'A002采购数据')
+        self.label_A002 = ttk.Label(self.top_frame, text='A002物料表地址：')
+        # self.text_A002 = Text(self.top_frame, height=1.2, width=10)
+        self.entry_A002 = ttk.Entry(self.top_frame, width=50)
+        # self.entry_A002.insert(0, 'D:\\')
+        # self.label2 = ttk.Label(self.top_frame, text='A002物料表名称：')
+        # self.entry2 = ttk.Entry(self.top_frame, width=20)
+        # self.entry2.insert(0, 'A002采购数据')
+        self.button_A002 = Button(self.top_frame, command=self.read_A002, image=self.image_file, bd=0, width=20,
+                                  height=20)    # text='查找A002'
+        self.button_A002.grid(row=0, column=2, sticky=W, pady=2, padx=2)
 
-        self.label3 = ttk.Label(self.top_frame, text='C016物料表地址：')
-        self.entry3 = ttk.Entry(self.top_frame, width=30)
-        self.entry3.insert(0, 'D:\\')
-        self.label4 = ttk.Label(self.top_frame, text='C016物料表名称：')
-        self.entry4 = ttk.Entry(self.top_frame, width=20)
-        self.entry4.insert(0, 'C016温州仓库物料')
+        self.label_C016 = ttk.Label(self.top_frame, text='C016物料表地址：')
+        self.entry_C016 = ttk.Entry(self.top_frame, width=50)
+        # self.entry_C016.insert(0, 'D:\\')
+        # self.label4 = ttk.Label(self.top_frame, text='C016物料表名称：')
+        # self.entry4 = ttk.Entry(self.top_frame, width=20)
+        # self.entry4.insert(0, 'C016温州仓库物料')
+        self.button_C016 = Button(self.top_frame, command=self.read_C016, image=self.image_file, bd=0, width=20,
+                                  height=20)  # text='查找A002'
+        self.button_C016.grid(row=1, column=2, sticky=W, pady=2, padx=2)
 
-        self.label5 = ttk.Label(self.top_frame, text='BOM表地址：')
-        self.entry5 = ttk.Entry(self.top_frame, width=30)
-        self.entry5.insert(0, 'D:\\')
-        self.label6 = ttk.Label(self.top_frame, text='BOM表名称：')
-        self.entry6 = ttk.Entry(self.top_frame, width=20)
-        self.entry6.insert(0, 'WG_NILMV02')
+        self.label_bom = ttk.Label(self.top_frame, text='BOM表地址：')
+        self.entry_bom = ttk.Entry(self.top_frame, width=50)
+        # self.entry_bom.insert(0, 'D:\\')
+        # self.label6 = ttk.Label(self.top_frame, text='BOM表名称：')
+        # self.entry6 = ttk.Entry(self.top_frame, width=20)
+        # self.entry6.insert(0, 'WG_NILMV02')
+        self.button_bom = Button(self.top_frame, command=self.read_bom, image=self.image_file, bd=0, width=20,
+                                  height=20)  # text='查找A002'
+        self.button_bom.grid(row=2, column=2, sticky=W, pady=2, padx=2)
 
-        self.label1.grid(row=0, sticky=W, pady=2)
-        self.entry1.grid(row=0, column=1, sticky=E+W, pady=2)#, columnspa=1
-        self.label2.grid(row=0, column=2, sticky=W, pady=2)
-        self.entry2.grid(row=0, column=3, sticky=E+W, pady=2)#, columnspa=1
+        self.label_A002.grid(row=0, sticky=W, pady=2)
+        self.entry_A002.grid(row=0, column=1, sticky=E+W, pady=2)#, columnspa=1
+        # self.text_A002.grid(row=0, column=1, sticky=E+W, pady=2)
+        # self.label2.grid(row=0, column=2, sticky=W, pady=2)
+        # self.entry2.grid(row=0, column=3, sticky=E+W, pady=2)#, columnspa=1
 
-        self.label3.grid(row=1, sticky=W, pady=2)
-        self.entry3.grid(row=1, column=1, sticky=E + W, pady=2)  # , columnspa=1
-        self.label4.grid(row=1, column=2, sticky=W, pady=2)
-        self.entry4.grid(row=1, column=3, sticky=E + W, pady=2)  # , columnspa=1
+        self.label_C016.grid(row=1, sticky=W, pady=2)
+        self.entry_C016.grid(row=1, column=1, sticky=E + W, pady=2)  # , columnspa=1
+        # self.label4.grid(row=1, column=2, sticky=W, pady=2)
+        # self.entry4.grid(row=1, column=3, sticky=E + W, pady=2)  # , columnspa=1
 
-        self.label5.grid(row=2, sticky=W, pady=2)
-        self.entry5.grid(row=2, column=1, sticky=E+W, pady=2)#, columnspa=1
-        self.label6.grid(row=2, column=2, sticky=W, pady=2)
-        self.entry6.grid(row=2, column=3, sticky=E + W, pady=2)#, columnspa=1
+        self.label_bom.grid(row=2, sticky=W, pady=2)
+        self.entry_bom.grid(row=2, column=1, sticky=E+W, pady=2)#, columnspa=1
+        # self.label6.grid(row=2, column=2, sticky=W, pady=2)
+        # self.entry6.grid(row=2, column=3, sticky=E + W, pady=2)#, columnspa=1
 
         self.button1 = ttk.Button(self.top_frame, text='确定', command=self.ok)
         self.button2 = ttk.Button(self.top_frame, text='移除', command=self.cancel)
         self.button3 = ttk.Button(self.top_frame, text='查找A002', command=self.start_A002)
         self.button4 = ttk.Button(self.top_frame, text='查找C016', command=self.start_C016)
-        self.button5 = ttk.Button(self.top_frame, text='完成', command=self.finish)
-        self.button1.grid(row=4, column=2, sticky=W, pady=2, padx=2)
-        self.button2.grid(row=4, column=3, sticky=W, pady=2, padx=28)
+        self.button5 = ttk.Button(self.top_frame, text='保存', command=self.save)
+        self.button1.grid(row=2, column=3, sticky=W, pady=2, padx=25)
+        self.button2.grid(row=2, column=4, sticky=W, pady=2, padx=8)
         # self.button3.grid(row=0, column=4, sticky=E, pady=3, padx=2, rowspan=2)
-        self.button3.grid(row=0, column=4, sticky=E, pady=2, padx=8)
+        self.button3.grid(row=0, column=3, sticky=W, pady=2, padx=25)
         # self.button4.grid(row=1, column=4, sticky=E, pady=3, padx=2, rowspan=2)
-        self.button4.grid(row=1, column=4, sticky=E, pady=2, padx=8)
-        self.button5.grid(row=4, column=4, sticky=E, pady=2, padx=8)
+        self.button4.grid(row=1, column=3, sticky=W, pady=2, padx=25)
+        self.button5.grid(row=1, column=4, sticky=W, pady=2, padx=8)
 
         # 左边listbox
         self.labelframe1 = ttk.LabelFrame(self.left_frame, text='仓库物料')
         self.scrollbar1 = ttk.Scrollbar(self.labelframe1)
-        self.listbox_left = Listbox(self.labelframe1, width=50, height=14, yscrollcommand=self.scrollbar1.set, exportselection=False)
+        self.listbox_left = Listbox(self.labelframe1, width=50, height=15, yscrollcommand=self.scrollbar1.set, exportselection=False)
         self.scrollbar1.config(command=self.listbox_left.yview)
         self.labelframe1.pack()
         self.scrollbar1.pack(side=RIGHT, fill=Y)
@@ -115,19 +127,85 @@ class My_gui(Frame):
         # 右边listbox
         self.labelframe2 = ttk.LabelFrame(self.right_frame, text='BOM表物料')
         self.scrollbar2 = ttk.Scrollbar(self.labelframe2)
-        self.listbox_right = Listbox(self.labelframe2, width=50, height=14, yscrollcommand=self.scrollbar2.set)
+        self.listbox_right = Listbox(self.labelframe2, width=50, height=15, yscrollcommand=self.scrollbar2.set)
         self.scrollbar2.config(command=self.listbox_right.yview)
         self.labelframe2.pack()
         self.scrollbar2.pack(side=RIGHT, fill=Y)
         self.listbox_right.pack(side=RIGHT)
         self.listbox_right.bind("<Button-1>", lambda e: self.insert_wuliao(e.y))
 
-        # 定义一个字典将右边listbox中的值对应到bom表中的索引
-        self.value_to_index = {}
-        # 定义一个列表存储匹配到的每一个物料
-        self.list = []
-        # 定义一个flag代表确定按钮选取的事那个仓库的物料，1：A002仓库，2：C016仓库
-        self.flag = 0
+        self.value_to_index = {}  # 定义一个字典将右边listbox中的值对应到bom表中的索引
+        self.list = []  # 定义一个列表存储匹配到的每一个物料
+        self.flag = 0  # 定义一个flag代表确定按钮选取的事那个仓库的物料，1：A002仓库，2：C016仓库
+        self.filename = 'path.txt'
+
+        self.init_path()
+
+    def text_save(self, content, filename, mode='w+'):
+        # Try to save a list variable in txt file.
+        file = open(filename, encoding='utf-8', mode=mode)
+        for i in range(len(content)):
+            file.write(str(content[i]) + '\n')
+        file.close()
+
+    def text_read(self, filename):
+        # Try to read a txt file and return a list.Return [] if there was a mistake.
+        try:
+            file = open(filename, encoding='utf-8', mode='r')
+        except IOError:
+            error = []
+            return error
+        content = file.readlines()
+        for i in range(len(content)):
+            content[i] = content[i][:len(content[i]) - 1]
+        file.close()
+        return content
+
+    # 初始化填入上次输入的路径
+    def init_path(self):
+        # with open(self.filename, 'rw+') as path:
+        #     path_A002 = path.readline()
+        #     print(path_A002)
+
+        # list_path = ['D:/A002采购数据.xlsx', 'D:/C016温州仓库物料.xlsx', 'D:/WG_NILMV02.xlsx']
+        list_path = self.text_read(self.filename)
+        if list_path[0]:
+            path_A002 = list_path[0]
+            self.entry_A002.insert(0, path_A002)
+            if list_path[1]:
+                path_C016 = list_path[1]
+                self.entry_C016.insert(0, path_C016)
+            if list_path[2]:
+                path_bom = list_path[2]
+                self.entry_bom.insert(0, path_bom)
+
+    # 保存输入文件路径
+    def save_path(self):
+        path_A002 = self.entry_A002.get()
+        path_C016 = self.entry_C016.get()
+        path_bom = self.entry_bom.get()
+        self.text_save([path_A002, path_C016, path_bom], filename=self.filename)  # list, filename, mode='w+'
+
+    # read_A002:选择A002物料表文件
+    def read_A002(self):
+        file_A002 = filedialog.askopenfile().name
+        self.entry_A002.delete(0, END)
+        self.entry_A002.insert(0, file_A002)
+        with open('path.txt', 'a', encoding='utf-8') as path:
+            path.write(file_A002 + '\n')
+            path.close()
+
+    # read_C016:选择C016物料文件
+    def read_C016(self):
+        file_C016 = filedialog.askopenfile().name
+        self.entry_C016.delete(0, END)
+        self.entry_C016.insert(0, file_C016)
+
+    # read_bom:选择bom物料文件
+    def read_bom(self):
+        file_bom = filedialog.askopenfile().name
+        self.entry_bom.delete(0, END)
+        self.entry_bom.insert(0, file_bom)
 
     # 完成按钮：选择查找到的正确的物料
     def ok(self):
@@ -172,20 +250,19 @@ class My_gui(Frame):
         self.labelframe1.config(text='A002物料')
         try:
             # 获取地址
-            A002_address = self.entry1.get()
-            A002_name = self.entry2.get() + '.xlsx'
-            A002 = os.path.join(A002_address, A002_name)
-            bom_address = self.entry5.get()
-            bom_name = self.entry6.get() + '.xlsx'
-            main.BOM = os.path.join(bom_address, bom_name)
-            main.BOM_sheet = self.entry6.get()
-            export_name = self.entry6.get() + '-new.xlsx'
-            main.export_address = os.path.join(bom_address, export_name)
+            A002_address = self.entry_A002.get()
+            bom_address = self.entry_bom.get()
+            main.BOM = bom_address
+            name = os.path.basename(bom_address)
+            name_file, name_suffix = os.path.splitext(name)
+            main.BOM_sheet = name_file
+            export_name = name_file + '-NEW' + name_suffix
+            main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
 
             if not main.comment:
                 self.labelframe1.text = 'A002物料'
                 main.read_bom()
-                main.read_warehouse(A002)
+                main.read_warehouse(A002_address)
                 # print(len(main.wuliao_script))
                 main.search_null()
                 dict_res = main.search_res()
@@ -200,7 +277,7 @@ class My_gui(Frame):
             else:
                 # main.dict_C016.update(main.dict)
                 # main.dict.clear()
-                main.read_warehouse(A002)
+                main.read_warehouse(A002_address)
                 dict_res = main.search_res()
                 dict_cap = main.search_cap()
                 main.dict_A002.update(dict_res)
@@ -211,29 +288,31 @@ class My_gui(Frame):
                 self.insert_bom(main.unsearched_index)
                 self.label_status.configure(text='')
         except FileNotFoundError:
+            self.clear_all()
             self.label_status.configure(text='')
             self.warning(message='文件名或路径错误！')
 
     def start_C016(self):
+        # 设置状态栏和表头
         self.label_status.configure(text='正在查找...')
         self.master.update()
-        self.flag = 2
         self.labelframe1.config(text='C016物料')
+
+        self.flag = 2   # 设置查找C016标志位
         try:
             # 获取地址
-            C016_address = self.entry3.get()
-            C016_name = self.entry4.get() + '.xlsx'
-            C016 = os.path.join(C016_address, C016_name)
-            bom_address = self.entry5.get()
-            bom_name = self.entry6.get() + '.xlsx'
-            main.BOM = os.path.join(bom_address, bom_name)
-            main.BOM_sheet = self.entry6.get()
-            export_name = self.entry6.get() + '-new.xlsx'
-            main.export_address = os.path.join(bom_address, export_name)
+            C016_address = self.entry_C016.get()
+            bom_address = self.entry_bom.get()
+            main.BOM = bom_address
+            name = os.path.basename(bom_address)
+            name_file, name_suffix = os.path.splitext(name)
+            main.BOM_sheet = name_file
+            export_name = name_file + '-NEW' + name_suffix
+            main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
 
             if not main.comment:
                 main.read_bom()
-                main.read_warehouse(C016)
+                main.read_warehouse(C016_address)
                 main.search_null()
                 dict_res = main.search_res()
                 dict_cap = main.search_cap()
@@ -247,7 +326,7 @@ class My_gui(Frame):
                 # main.first_dict.update(main.dict)
                 # print(main.first_dict)
                 # main.dict.clear()
-                main.read_warehouse(C016)
+                main.read_warehouse(C016_address)
                 # print(len(main.wuliao_script))
                 dict_res = main.search_res()
                 dict_cap = main.search_cap()
@@ -259,16 +338,22 @@ class My_gui(Frame):
                 self.insert_bom(main.unsearched_index)
                 self.label_status.configure(text='')
         except FileNotFoundError:
+            self.clear_all()
             self.label_status.configure(text='')
             self.warning(message='文件名或路径错误！')
         pass
 
-    def finish(self):
+    def select_file(self):
+        adress = filedialog.asksaveasfilename()
+        return adress
+
+    def save(self):
+        self.save_path()
         if (len(main.dict_A002)) | (len(main.dict_C016)):
             # for i in range(main.comment_len):
             #     if (i not in main.has_searched_index) & (i not in main.unsearched_index):
             #         print(main.comment[i])
-            main.write_to_excel()
+            main.write_to_excel(self.select_file())
             self.master.destroy()
         else:
             self.warning('未完成匹配或无匹配项')
@@ -292,7 +377,6 @@ class My_gui(Frame):
             value = self.listbox_right.get(curvalue)    # value值为listbox_right显示的值
             self.index = self.value_to_index[value]       # 将value转为对应的excel序号
             key = main.unsearched_key[self.index]     # 将序号转为关键字key，然后去物料表匹配
-            print(key)
             self.list = sc.search_other_in_a002(key)    # list为匹配到的物料列表
             if not self.list:
                 self.list.append('无匹配项')

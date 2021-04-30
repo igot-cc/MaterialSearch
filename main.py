@@ -138,6 +138,10 @@ def replace_R(old_script):
 
 def deal_wuliao_script():
     # global wuliao_script_len
+    wuliao_cap.clear()
+    wuliao_cap_id.clear()
+    wuliao_res.clear()
+    wuliao_res_id.clear()
     for i in range(wuliao_script_len):
         if ('电容' in wuliao_script[i]):
             wuliao_script[i] = replace_uf(wuliao_script[i])
@@ -225,7 +229,6 @@ def search_cap():
     global has_searched_index
     dict_cap = {}
     for i in range(comment_len):
-
         # 先将comment的数值处理一下，只得到容值和单位如“1nF”
         if i not in has_searched_index:
             value_searched = re.search(r'[0-9]+([.]{1}[0-9]+){0,1}(nF|pF|uF|μF|F)', str(comment[i]), re.I) # [0-9]+([.]{1}[0-9]+){0,1}  匹配整数或小数
@@ -249,7 +252,10 @@ def search_cap():
 
             # 2、匹配贴片电容封装
             if footprint_searched:
-                res_or_cap_index.append(i)
+                footprint_tan = re.search(r'[^a-zA-Z]+([ABCDE])[^a-zA-Z]*', footprint[i], re.I)
+                if not footprint_tan:
+                    res_or_cap_index.append(i)
+                # res_or_cap_index.append(i)
                 footprint_searched = footprint_searched.group()
             else:
                 continue
@@ -279,7 +285,7 @@ def get_other():
             continue
         elif str(comment[i])[0].isdigit():  # 如果第一个字符是数字
             # 匹配钽电容或电解电容************************************
-            cap = re.search(r'[0-9]+([.]{1}[0-9]+){0,1}(nF|pF|uF|μF|F)', str(comment[i]), re.I)  # [0-9]+([.]{1}[0-9]+){0,1}  匹配整数或小数
+            cap = re.search(r'[0-9]+([.]{1}[0-9]+){0,1}(nF|pF|uF|μF|F)+', str(comment[i]), re.I)  # [0-9]+([.]{1}[0-9]+){0,1}  匹配整数或小数
             if cap:
                 cap = cap.group()
                 if '.' in cap:
@@ -343,15 +349,19 @@ def get_other():
                 continue
 
             # 匹配长度小于4，不在电阻或电容内的
-            elif (len(value) <= 4) & (i not in res_or_cap_index):
-                unsearched_index.append(i)
-                unsearched_key[i] = value
-                continue
+            elif i not in res_or_cap_index:
+                if len(value) <= 4:
+                    unsearched_index.append(i)
+                    unsearched_key[i] = value
+                    continue
+                else:
+                    unsearched_index.append(i)
+                    unsearched_key[i] = value[0:4]
+                    continue
 
         else:   # 第一个字符不是数字
             # 不匹配查找过的电阻电容
             if i in res_or_cap_index:
-                # print(value)
                 continue
             key = re.search(r'^[a-zA-Z]+[\d]+', value, re.I)  # 匹配以字母开头，以数字结尾
 
@@ -404,7 +414,7 @@ def read_BOM_dataframe():
 # first_warehouse = ''
 # second_warehouse = ''
 
-def write_to_excel():
+def write_to_excel(adress):
     # 建立表头
     df_bom = read_BOM_dataframe()
     bom_heard = list(df_bom)
@@ -458,8 +468,7 @@ def write_to_excel():
     df_result = pd.concat([df_result, df_unsearched], ignore_index=True)
 
     # 写入到excel
-    df_result.to_excel(export_address, sheet_name=BOM_sheet, index=False)
-
+    df_result.to_excel(adress, sheet_name=BOM_sheet, index=False)
 
     # # 设置excel格式
     # app = xw.App(visible=False, add_book=False)
