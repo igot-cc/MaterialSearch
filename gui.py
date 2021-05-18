@@ -4,14 +4,14 @@ from tkinter import messagebox
 from tkinter import filedialog
 import main, search_in_sh as sc
 import os
+import windnd
 
 class My_gui(Frame):
     def __init__(self, master=None):
         super().__init__(master)
         # self.master = master
         # self.pack()
-
-        self.image_file = PhotoImage(file='D:/search/file.png')
+        self.image_file = PhotoImage(file=os.getcwd() + '\\' + 'file.png')
 
         # # 菜单栏
         # self.menubar = Menu(master)
@@ -29,7 +29,6 @@ class My_gui(Frame):
         # 状态栏
         self.separator = ttk.Separator(self.master).pack(padx=2, fill='x')
         self.status_frame = ttk.Frame(self.separator, relief='raised', height='20').pack(fill='x')
-        # self.status_label = ttk.Label(self.status_frame, text='状态栏').pack(side=LEFT, fill='x')
         # # 进度条
         self.pb = ttk.Progressbar(self.status_frame, length=150, value=0, mode='indeterminate')
         # label
@@ -53,54 +52,30 @@ class My_gui(Frame):
         self.panedwin_bottom.add(self.left_frame)
         self.panedwin_bottom.add(self.right_frame)
 
-        # label、Entry、Button
+        # label、Entry
         self.label_A002 = ttk.Label(self.top_frame, text='A002物料表地址：')
-        # self.text_A002 = Text(self.top_frame, height=1.2, width=10)
         self.entry_A002 = ttk.Entry(self.top_frame, width=50)
-        # self.entry_A002.insert(0, 'D:\\')
-        # self.label2 = ttk.Label(self.top_frame, text='A002物料表名称：')
-        # self.entry2 = ttk.Entry(self.top_frame, width=20)
-        # self.entry2.insert(0, 'A002采购数据')
         self.button_A002 = Button(self.top_frame, command=self.read_A002, image=self.image_file, bd=0, width=20,
                                   height=20)    # text='查找A002'
         self.button_A002.grid(row=0, column=2, sticky=W, pady=2, padx=2)
-
         self.label_C016 = ttk.Label(self.top_frame, text='C016物料表地址：')
         self.entry_C016 = ttk.Entry(self.top_frame, width=50)
-        # self.entry_C016.insert(0, 'D:\\')
-        # self.label4 = ttk.Label(self.top_frame, text='C016物料表名称：')
-        # self.entry4 = ttk.Entry(self.top_frame, width=20)
-        # self.entry4.insert(0, 'C016温州仓库物料')
         self.button_C016 = Button(self.top_frame, command=self.read_C016, image=self.image_file, bd=0, width=20,
                                   height=20)  # text='查找A002'
         self.button_C016.grid(row=1, column=2, sticky=W, pady=2, padx=2)
-
         self.label_bom = ttk.Label(self.top_frame, text='BOM表地址：')
         self.entry_bom = ttk.Entry(self.top_frame, width=50)
-        # self.entry_bom.insert(0, 'D:\\')
-        # self.label6 = ttk.Label(self.top_frame, text='BOM表名称：')
-        # self.entry6 = ttk.Entry(self.top_frame, width=20)
-        # self.entry6.insert(0, 'WG_NILMV02')
         self.button_bom = Button(self.top_frame, command=self.read_bom, image=self.image_file, bd=0, width=20,
                                   height=20)  # text='查找A002'
         self.button_bom.grid(row=2, column=2, sticky=W, pady=2, padx=2)
-
         self.label_A002.grid(row=0, sticky=W, pady=2)
         self.entry_A002.grid(row=0, column=1, sticky=E+W, pady=2)#, columnspa=1
-        # self.text_A002.grid(row=0, column=1, sticky=E+W, pady=2)
-        # self.label2.grid(row=0, column=2, sticky=W, pady=2)
-        # self.entry2.grid(row=0, column=3, sticky=E+W, pady=2)#, columnspa=1
-
         self.label_C016.grid(row=1, sticky=W, pady=2)
         self.entry_C016.grid(row=1, column=1, sticky=E + W, pady=2)  # , columnspa=1
-        # self.label4.grid(row=1, column=2, sticky=W, pady=2)
-        # self.entry4.grid(row=1, column=3, sticky=E + W, pady=2)  # , columnspa=1
-
         self.label_bom.grid(row=2, sticky=W, pady=2)
         self.entry_bom.grid(row=2, column=1, sticky=E+W, pady=2)#, columnspa=1
-        # self.label6.grid(row=2, column=2, sticky=W, pady=2)
-        # self.entry6.grid(row=2, column=3, sticky=E + W, pady=2)#, columnspa=1
 
+        # button
         self.button1 = ttk.Button(self.top_frame, text='确定', command=self.ok)
         self.button2 = ttk.Button(self.top_frame, text='移除', command=self.cancel)
         self.button3 = ttk.Button(self.top_frame, text='查找A002', command=self.start_A002)
@@ -108,9 +83,7 @@ class My_gui(Frame):
         self.button5 = ttk.Button(self.top_frame, text='保存', command=self.save)
         self.button1.grid(row=2, column=3, sticky=W, pady=2, padx=25)
         self.button2.grid(row=2, column=4, sticky=W, pady=2, padx=8)
-        # self.button3.grid(row=0, column=4, sticky=E, pady=3, padx=2, rowspan=2)
         self.button3.grid(row=0, column=3, sticky=W, pady=2, padx=25)
-        # self.button4.grid(row=1, column=4, sticky=E, pady=3, padx=2, rowspan=2)
         self.button4.grid(row=1, column=3, sticky=W, pady=2, padx=25)
         self.button5.grid(row=1, column=4, sticky=W, pady=2, padx=8)
 
@@ -134,12 +107,36 @@ class My_gui(Frame):
         self.listbox_right.pack(side=RIGHT)
         self.listbox_right.bind("<Button-1>", lambda e: self.insert_wuliao(e.y))
 
+        windnd.hook_dropfiles(self.entry_A002, func=self.dragged_A002)
+        windnd.hook_dropfiles(self.entry_C016, func=self.dragged_C016)
+        windnd.hook_dropfiles(self.entry_bom, func=self.dragged_bom)
+
         self.value_to_index = {}  # 定义一个字典将右边listbox中的值对应到bom表中的索引
         self.list = []  # 定义一个列表存储匹配到的每一个物料
         self.flag = 0  # 定义一个flag代表确定按钮选取的事那个仓库的物料，1：A002仓库，2：C016仓库
         self.filename = 'path.txt'
 
         self.init_path()
+
+    # 拖拽获取路径
+    def dragged_A002(self, file):
+        if len(file) != 1:
+            self.warning('只能放入一个文件')
+        else:
+            self.entry_A002.delete(0, END)
+            self.entry_A002.insert(0, file[0].decode('gbk'))
+    def dragged_C016(self, file):
+        if len(file) != 1:
+            self.warning('只能放入一个文件')
+        else:
+            self.entry_C016.delete(0, END)
+            self.entry_C016.insert(0, file[0].decode('gbk'))
+    def dragged_bom(self, file):
+        if len(file) != 1:
+            self.warning('只能放入一个文件')
+        else:
+            self.entry_bom.delete(0, END)
+            self.entry_bom.insert(0, file[0].decode('gbk'))
 
     def text_save(self, content, filename, mode='w+'):
         # Try to save a list variable in txt file.
@@ -191,9 +188,9 @@ class My_gui(Frame):
         file_A002 = filedialog.askopenfile().name
         self.entry_A002.delete(0, END)
         self.entry_A002.insert(0, file_A002)
-        with open('path.txt', 'a', encoding='utf-8') as path:
-            path.write(file_A002 + '\n')
-            path.close()
+        # with open('path.txt', 'a', encoding='utf-8') as path:
+        #     path.write(file_A002 + '\n')
+        #     path.close()
 
     # read_C016:选择C016物料文件
     def read_C016(self):
@@ -256,8 +253,8 @@ class My_gui(Frame):
             name = os.path.basename(bom_address)
             name_file, name_suffix = os.path.splitext(name)
             main.BOM_sheet = name_file
-            export_name = name_file + '-NEW' + name_suffix
-            main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
+            # export_name = name_file + '-NEW' + name_suffix
+            # main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
 
             if not main.comment:
                 self.labelframe1.text = 'A002物料'
@@ -307,8 +304,8 @@ class My_gui(Frame):
             name = os.path.basename(bom_address)
             name_file, name_suffix = os.path.splitext(name)
             main.BOM_sheet = name_file
-            export_name = name_file + '-NEW' + name_suffix
-            main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
+            # export_name = name_file + '-NEW' + name_suffix
+            # main.export_address = os.path.join(os.path.dirname(bom_address), export_name)
 
             if not main.comment:
                 main.read_bom()
@@ -344,7 +341,22 @@ class My_gui(Frame):
         pass
 
     def select_file(self):
-        adress = filedialog.asksaveasfilename()
+        # filename = tkinter.filedialog.asksaveasfilename(
+        #     defaultextension='.txt',  # 默认文件的扩展名
+        #     filetypes=[('txt Files', '*.txt'),
+        #                ('pkl Files', '*.pkl'),
+        #                ('All Files', '*.*')],  # 设置文件类型下拉菜单里的的选项
+        #     initialdir='',  # 对话框中默认的路径
+        #     initialfile='test',  # 对话框中初始化显示的文件名
+        #     # parent=self.master,                #父对话框(由哪个窗口弹出就在哪个上端)
+        #     title="另存为"  # 弹出对话框的标题
+        # )
+        bom_dirname, bom_basename = os.path.split(self.entry_bom.get())
+        bom_basename_name, bom_basename_suffix = os.path.splitext(bom_basename)
+        adress = filedialog.asksaveasfilename(defaultextension='.xlsx',
+                                              filetypes=[('excel', '*.xlsx')],
+                                              initialdir=bom_dirname,
+                                              initialfile= bom_basename_name+'-BOM'+bom_basename_suffix)
         return adress
 
     def save(self):

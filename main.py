@@ -22,7 +22,7 @@ def get_column_name(columnindex):
 # BOM_sheet = "WG_NILMV02"
 BOM = ''
 BOM_sheet = ''
-export_address = ''
+# export_address = ''
 
 comment = []
 comment_len = 0
@@ -281,7 +281,9 @@ def get_other():
     unsearched_key.clear()
     for i in range(comment_len):    # 根据comment值匹配所有可能的元件，手动选择
         value = str(comment[i])
-        if i in has_searched_index or i in res_or_cap_index:
+        if comment[i]=='':
+            continue
+        elif i in has_searched_index or i in res_or_cap_index:
             continue
         elif str(comment[i])[0].isdigit():  # 如果第一个字符是数字
             # 匹配钽电容或电解电容************************************
