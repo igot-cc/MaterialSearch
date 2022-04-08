@@ -17,17 +17,12 @@ def get_column_name(columnindex):
 
     return ret
 
-# 定义BOM表名称
-# BOM = "WG_NILMV02.xlsx"
-# BOM_sheet = "WG_NILMV02"
 BOM = ''
 BOM_sheet = ''
-# export_address = ''
-
 comment = []
 comment_len = 0
 footprint = []
-# footprint_len = 0
+
 def read_bom():
     global comment
     global comment_len
@@ -93,16 +88,18 @@ def read_warehouse(adress):
     sht = wb.sheets[0]
     # 拿取sheet的物料描述和物料编号
     nrows = sht.used_range.last_cell.row   # 获取总行数
-    wuliao_script = sht.range('D2:' + 'D' + str(nrows)).value
+    first_row = sht.range("A1:J1").value
+    wuliao_index = first_row.index("物料") + 1
+    wuliao_col = get_column_name(wuliao_index)
+    wuliaomiaoshu_index = first_row.index("物料描述") + 1
+    wuliaomiaoshu_col = get_column_name(wuliaomiaoshu_index)
+    # wuliao_id = sht.range('C2:' + 'C' + str(nrows)).value
+    wuliao_id = sht.range(wuliao_col + '2:' + wuliao_col + str(nrows)).value
+    # wuliao_script = sht.range('D2:' + 'D' + str(nrows)).value
+    wuliao_script = sht.range(wuliaomiaoshu_col + '2:' + wuliaomiaoshu_col + str(nrows)).value
     wuliao_script_len = len(wuliao_script)
-    wuliao_id = sht.range('C2:' + 'C' + str(nrows)).value
-    # wuliao_id_len = len(wuliao_id)
-    deal_wuliao_script()
 
-    # print(type(wuliao_script_len))
-    # print(wuliao_script_len)
-    # print(wuliao_script[0])
-    # print(wuliao_script[3182])
+    deal_wuliao_script()
 
     # 关闭工作薄
     wb.save()

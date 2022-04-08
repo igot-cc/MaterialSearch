@@ -5,6 +5,7 @@ from tkinter import filedialog
 import main, search_in_sh as sc
 import os
 import windnd
+import record
 
 class My_gui(Frame):
     def __init__(self, master=None):
@@ -55,17 +56,17 @@ class My_gui(Frame):
         # label、Entry
         self.label_A002 = ttk.Label(self.top_frame, text='A002物料表地址：')
         self.entry_A002 = ttk.Entry(self.top_frame, width=50)
-        self.button_A002 = Button(self.top_frame, command=self.read_A002, image=self.image_file, bd=0, width=20,
+        self.button_A002 = Button(self.top_frame, command=self.select_A002, image=self.image_file, bd=0, width=20,
                                   height=20)    # text='查找A002'
         self.button_A002.grid(row=0, column=2, sticky=W, pady=2, padx=2)
         self.label_C016 = ttk.Label(self.top_frame, text='C016物料表地址：')
         self.entry_C016 = ttk.Entry(self.top_frame, width=50)
-        self.button_C016 = Button(self.top_frame, command=self.read_C016, image=self.image_file, bd=0, width=20,
+        self.button_C016 = Button(self.top_frame, command=self.select_C016, image=self.image_file, bd=0, width=20,
                                   height=20)  # text='查找A002'
         self.button_C016.grid(row=1, column=2, sticky=W, pady=2, padx=2)
         self.label_bom = ttk.Label(self.top_frame, text='BOM表地址：')
         self.entry_bom = ttk.Entry(self.top_frame, width=50)
-        self.button_bom = Button(self.top_frame, command=self.read_bom, image=self.image_file, bd=0, width=20,
+        self.button_bom = Button(self.top_frame, command=self.select_bom, image=self.image_file, bd=0, width=20,
                                   height=20)  # text='查找A002'
         self.button_bom.grid(row=2, column=2, sticky=W, pady=2, padx=2)
         self.label_A002.grid(row=0, sticky=W, pady=2)
@@ -160,31 +161,44 @@ class My_gui(Frame):
 
     # 初始化填入上次输入的路径
     def init_path(self):
-        # with open(self.filename, 'rw+') as path:
-        #     path_A002 = path.readline()
-        #     print(path_A002)
+        #从json文件读取
+        path_A002 = record.get_address('A002')
+        self.entry_A002.insert(0, path_A002)
+        path_C016 = record.get_address('C016')
+        self.entry_A002.insert(0, path_C016)
+        path_bom = record.get_address('BOM')
+        self.entry_A002.insert(0, path_bom)
+        # path_yf = record.get_address('研发仓')
+        # self.entry_A002.insert(0, path_yf)
 
-        # list_path = ['D:/A002采购数据.xlsx', 'D:/C016温州仓库物料.xlsx', 'D:/WG_NILMV02.xlsx']
-        list_path = self.text_read(self.filename)
-        if list_path[0]:
-            path_A002 = list_path[0]
-            self.entry_A002.insert(0, path_A002)
-            if list_path[1]:
-                path_C016 = list_path[1]
-                self.entry_C016.insert(0, path_C016)
-            if list_path[2]:
-                path_bom = list_path[2]
-                self.entry_bom.insert(0, path_bom)
+        #从txt文件读取
+        # list_path = self.text_read(self.filename)
+        # if list_path[0]:
+        #     path_A002 = list_path[0]
+        #     self.entry_A002.insert(0, path_A002)
+        #     if list_path[1]:
+        #         path_C016 = list_path[1]
+        #         self.entry_C016.insert(0, path_C016)
+        #     if list_path[2]:
+        #         path_bom = list_path[2]
+        #         self.entry_bom.insert(0, path_bom)
 
     # 保存输入文件路径
     def save_path(self):
+        #保存地址到json文件
         path_A002 = self.entry_A002.get()
         path_C016 = self.entry_C016.get()
         path_bom = self.entry_bom.get()
-        self.text_save([path_A002, path_C016, path_bom], filename=self.filename)  # list, filename, mode='w+'
+        record.modify_by_dict({'A002':path_A002, 'C016':path_C016, 'BOM':path_bom})
 
-    # read_A002:选择A002物料表文件
-    def read_A002(self):
+        #保存文件到txt文件
+        # path_A002 = self.entry_A002.get()
+        # path_C016 = self.entry_C016.get()
+        # path_bom = self.entry_bom.get()
+        # self.text_save([path_A002, path_C016, path_bom], filename=self.filename)  # list, filename, mode='w+'
+
+    # select_A002:选择A002物料表文件
+    def select_A002(self):
         file_A002 = filedialog.askopenfile().name
         self.entry_A002.delete(0, END)
         self.entry_A002.insert(0, file_A002)
@@ -192,14 +206,14 @@ class My_gui(Frame):
         #     path.write(file_A002 + '\n')
         #     path.close()
 
-    # read_C016:选择C016物料文件
-    def read_C016(self):
+    # select_C016:选择C016物料文件
+    def select_C016(self):
         file_C016 = filedialog.askopenfile().name
         self.entry_C016.delete(0, END)
         self.entry_C016.insert(0, file_C016)
 
-    # read_bom:选择bom物料文件
-    def read_bom(self):
+    # select_bom:选择bom物料文件
+    def select_bom(self):
         file_bom = filedialog.askopenfile().name
         self.entry_bom.delete(0, END)
         self.entry_bom.insert(0, file_bom)
@@ -208,17 +222,15 @@ class My_gui(Frame):
     def ok(self):
         dict_temp = {}
         value = self.get_left_value()   # 拿到左边窗口点击的值
-        excel_index = self.index + 2
-        dict_temp[excel_index] = list(value)
-        if self.flag == 1:
-            main.dict_A002.update(dict_temp)
-        if self.flag == 2:
-            main.dict_C016.update(dict_temp)
-        main.has_searched_index.append(self.index)
-        # print(excel_index)
-        # print(value)
-        # print(main.dict)
-        self.clear()
+        if value != "无匹配项":
+            excel_index = self.index + 2
+            dict_temp[excel_index] = list(value)
+            if self.flag == 1:
+                main.dict_A002.update(dict_temp)
+            if self.flag == 2:
+                main.dict_C016.update(dict_temp)
+            main.has_searched_index.append(self.index)
+            self.clear()
 
     # 删除右边选中的值，同时清除左边
     def clear(self):
@@ -354,7 +366,7 @@ class My_gui(Frame):
         bom_dirname, bom_basename = os.path.split(self.entry_bom.get())
         bom_basename_name, bom_basename_suffix = os.path.splitext(bom_basename)
         adress = filedialog.asksaveasfilename(defaultextension='.xlsx',
-                                              filetypes=[('excel', '*.xlsx')],
+                                              filetypes=[('excel文件', '*.xlsx'), ('所有文件', '*.*')],
                                               initialdir=bom_dirname,
                                               initialfile= bom_basename_name+'-BOM'+bom_basename_suffix)
         return adress
@@ -365,8 +377,10 @@ class My_gui(Frame):
             # for i in range(main.comment_len):
             #     if (i not in main.has_searched_index) & (i not in main.unsearched_index):
             #         print(main.comment[i])
-            main.write_to_excel(self.select_file())
-            self.master.destroy()
+            save_path = self.select_file()
+            if save_path:
+                main.write_to_excel(save_path)
+                self.master.destroy()
         else:
             self.warning('未完成匹配或无匹配项')
 
