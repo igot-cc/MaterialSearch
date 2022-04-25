@@ -28,6 +28,8 @@ def get_address(excel_name):
         return data_json['研发仓']
     elif excel_name == 'BOM':
         return data_json['BOM']
+    elif excel_name == 'PBOM':
+        return data_json['PBOM']
 
 #修改并存储地址
 def modify(excel_name, new_address):
@@ -54,6 +56,8 @@ def modify_by_dict(new_address_dict):
             data_json['研发仓'] = value
         elif key == 'BOM':
             data_json['BOM'] = value
+        elif key == 'PBOM':
+            data_json['PBOM'] = value
     save(data_json)
 
 if __name__ == '__main__':

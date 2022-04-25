@@ -18,8 +18,8 @@ def search_res_in_a002(value_searched, footprint_searched):
     # 3、到A002中的wuliao_res匹配阻值和封装
     # 循环每一个描述的字符串进行匹配
     list_temp_all = []
-    pattern_value = '[^0-9\.]' + value_searched + '\D'  # '\D': 匹配任意非数字
-    pattern_footprint = '\D' + footprint_searched
+    pattern_value = r'[^0-9\.]' + value_searched + r'\D'  # '\D': 匹配任意非数字
+    pattern_footprint = r'\D' + footprint_searched
     for index in range(len(main.wuliao_res)):
         # 先匹配阻值
         # value_searched_boolean  = re.search(value_searched,wuliao_script[index])
@@ -55,8 +55,8 @@ def search_cap_in_a002(value_searched, footprint_searched):
     # 3、到A002中的wuliao_script匹配阻值和封装
     # 循环每一个描述的字符串进行匹配
     list_temp_all = []
-    pattern_value = '[^0-9\.]' + value_searched  # + '\D'  # '\D': 匹配任意非数字
-    pattern_footprint = '\D' + footprint_searched
+    pattern_value = r'[^0-9\.]' + value_searched  # + '\D'  # '\D': 匹配任意非数字
+    pattern_footprint = r'\D' + footprint_searched
     for index in range(len(main.wuliao_cap)):
         # 先匹配容值
         # value_searched_boolean  = re.search(value_searched,wuliao_script[index])

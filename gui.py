@@ -69,12 +69,21 @@ class My_gui(Frame):
         self.button_bom = Button(self.top_frame, command=self.select_bom, image=self.image_file, bd=0, width=20,
                                   height=20)  # text='查找A002'
         self.button_bom.grid(row=2, column=2, sticky=W, pady=2, padx=2)
+
+        self.label_PBOM = ttk.Label(self.top_frame, text='PBOM地址：')     #PBOM的label
+        self.entry_PBOM = ttk.Entry(self.top_frame, width=50)             #PBOM的entry
+        self.button_PBOM = Button(self.top_frame, command=self.select_bom, image=self.image_file, bd=0, width=20,
+                                 height=20)  # text='查找A002'
+        self.button_PBOM.grid(row=3, column=2, sticky=W, pady=2, padx=2)
+
         self.label_A002.grid(row=0, sticky=W, pady=2)
         self.entry_A002.grid(row=0, column=1, sticky=E+W, pady=2)#, columnspa=1
         self.label_C016.grid(row=1, sticky=W, pady=2)
         self.entry_C016.grid(row=1, column=1, sticky=E + W, pady=2)  # , columnspa=1
         self.label_bom.grid(row=2, sticky=W, pady=2)
         self.entry_bom.grid(row=2, column=1, sticky=E+W, pady=2)#, columnspa=1
+        self.label_PBOM.grid(row=3, sticky=W, pady=2)
+        self.entry_PBOM.grid(row=3, column=1, sticky=E + W, pady=2)  # , columnspa=1
 
         # button
         self.button1 = ttk.Button(self.top_frame, text='确定', command=self.ok)
@@ -82,11 +91,13 @@ class My_gui(Frame):
         self.button3 = ttk.Button(self.top_frame, text='查找A002', command=self.start_A002)
         self.button4 = ttk.Button(self.top_frame, text='查找C016', command=self.start_C016)
         self.button5 = ttk.Button(self.top_frame, text='保存', command=self.save)
+        self.button_export_EBOM = ttk.Button(self.top_frame, text='导出EBOM', command=self.ExportEBOM)
         self.button1.grid(row=2, column=3, sticky=W, pady=2, padx=25)
         self.button2.grid(row=2, column=4, sticky=W, pady=2, padx=8)
         self.button3.grid(row=0, column=3, sticky=W, pady=2, padx=25)
         self.button4.grid(row=1, column=3, sticky=W, pady=2, padx=25)
         self.button5.grid(row=1, column=4, sticky=W, pady=2, padx=8)
+        self.button_export_EBOM.grid(row=3, column=3, sticky=W, pady=2, padx=25)
 
         # 左边listbox
         self.labelframe1 = ttk.LabelFrame(self.left_frame, text='仓库物料')
@@ -119,6 +130,11 @@ class My_gui(Frame):
 
         self.init_path()
 
+    # 导出EBOM
+    def ExportEBOM(self):
+        value = main.read_PBOM("ARCctrl_V0.1-PBOM.XLSX")
+        main.write_PBOM_to_EBOM(value)
+
     # 拖拽获取路径
     def dragged_A002(self, file):
         if len(file) != 1:
@@ -138,6 +154,12 @@ class My_gui(Frame):
         else:
             self.entry_bom.delete(0, END)
             self.entry_bom.insert(0, file[0].decode('gbk'))
+    def dragged_PBOM(self, file):
+        if len(file) != 1:
+            self.warning('只能放入一个文件')
+        else:
+            self.entry_PBOM.delete(0, END)
+            self.entry_PBOM.insert(0, file[0].decode('gbk'))
 
     def text_save(self, content, filename, mode='w+'):
         # Try to save a list variable in txt file.
@@ -165,9 +187,11 @@ class My_gui(Frame):
         path_A002 = record.get_address('A002')
         self.entry_A002.insert(0, path_A002)
         path_C016 = record.get_address('C016')
-        self.entry_A002.insert(0, path_C016)
+        self.entry_C016.insert(0, path_C016)
         path_bom = record.get_address('BOM')
-        self.entry_A002.insert(0, path_bom)
+        self.entry_bom.insert(0, path_bom)
+        path_PBOM = record.get_address('PBOM')
+        self.entry_PBOM.insert(0, path_PBOM)
         # path_yf = record.get_address('研发仓')
         # self.entry_A002.insert(0, path_yf)
 
@@ -189,7 +213,8 @@ class My_gui(Frame):
         path_A002 = self.entry_A002.get()
         path_C016 = self.entry_C016.get()
         path_bom = self.entry_bom.get()
-        record.modify_by_dict({'A002':path_A002, 'C016':path_C016, 'BOM':path_bom})
+        path_PBOM = self.entry_PBOM.get()
+        record.modify_by_dict({'A002':path_A002, 'C016':path_C016, 'BOM':path_bom, 'PBOM': path_PBOM})
 
         #保存文件到txt文件
         # path_A002 = self.entry_A002.get()
@@ -247,10 +272,6 @@ class My_gui(Frame):
     def progressbar_show(self):
         self.pb.pack(self.status_frame, side=LEFT, padx=3, pady=2)
         self.pb.start()
-    #
-    # def progressbar_kill(self):
-    #     self.pb.stop()
-    #     self.pb.grid_forget()
 
     def start_A002(self):
         self.label_status.configure(text='正在查找...')
@@ -284,8 +305,6 @@ class My_gui(Frame):
                 self.label_status.config(text='')
 
             else:
-                # main.dict_C016.update(main.dict)
-                # main.dict.clear()
                 main.read_warehouse(A002_address)
                 dict_res = main.search_res()
                 dict_cap = main.search_cap()

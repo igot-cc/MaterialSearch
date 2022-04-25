@@ -5,7 +5,8 @@ from tkinter import *
 import gui, search_in_sh as sc
 import string
 import re
-# import os
+import os
+import shutil
 
 def get_column_name(columnindex):
     ret = ''
@@ -69,18 +70,11 @@ def read_bom():
 wuliao_script = []
 wuliao_script_len = 0
 wuliao_id = []
-# wuliao_id_len = 0
-# A002 = ''
-# 读取仓库里的物料描述（D列）和物料号（C列）
+
 def read_warehouse(adress):
     global wuliao_script
     global wuliao_script_len
     global wuliao_id
-    # global wuliao_id_len
-    # global A002
-    # 定义A002仓库的名称
-    # A002 = "A002采购数据11.10.xlsx"
-    # A002_sheet = "Sheet1"
 
     app = xw.App(visible=False, add_book=False)
     wb = app.books.open(adress)
@@ -105,6 +99,26 @@ def read_warehouse(adress):
     wb.save()
     wb.close()
     app.quit()
+
+def read_PBOM(adress):
+    app = xw.App(visible=False, add_book=False)
+    wb = app.books.open(adress)
+    try:
+        sht = wb.sheets["BOM"]  #打开sheet
+    except:
+        print("no sheet")
+        return None
+
+    #拿取物料描述
+    nrows = sht.used_range.last_cell.row   # 获取总行数
+    wuliao_sc = sht.range('D12:D' + str(nrows)).value   #获取物料描述列表
+    loction_num = sht.range('E12:E' + str(nrows)).value   #获取物料描述列表
+    use_num = sht.range('F12:F' + str(nrows)).value   #获取物料描述列表
+    value = {'script': wuliao_sc, 'loction': loction_num, 'num': use_num}
+
+    wb.close()
+    app.quit()
+    return value
 
 # 处理物料表数据,挑出所有电容和电阻，替换μF、R、
 wuliao_cap = []
@@ -155,7 +169,6 @@ def deal_wuliao_script():
 
 # --------------------------------------------------
 # 查找BOM表里的comment项和footprint项对应仓库的wuliao_script项
-# dict = {}   # 创建一个字典保存查找到的元件信息
 dict_A002 = {}     # 用来存储第一次匹配到的物料信息
 dict_C016 = {}     # 用来存储第二次匹配到的物料信息
 has_searched_index = []     # 已经找到的元件索引
@@ -518,12 +531,77 @@ def write_to_excel(adress):
     # wb.close()
     # app.kill()
 
+def write_PBOM_to_EBOM(PBOM):
+    wuliao_sc = PBOM['script']
+    print(wuliao_sc)
+    loction_num = PBOM['loction']
+    use_num = PBOM['num']
+    length = len(wuliao_sc)
+
+    new_EOM = 'new_EBOM.xlsx'
+    if not os.path.exists(new_EOM):
+        try:
+            shutil.copyfile('EBOM_Template.XLSX', new_EOM)
+        except:
+            print('EBOM 建立失败')
+            return None
+
+    app = xw.App(visible=False, add_book=False)
+    wb = app.books.open(new_EOM)
+    print(wb.name)
+    try:
+        sht = wb.sheets['电子组件板EBOM（1）']  # 打开sheet
+    except:
+        print("no sheet")
+        return None
+
+    try:
+        # 计算需要几个sheet并新建到excel
+        integer = int(length / 18)
+        print(integer)
+        remainder = length % 18
+        print(remainder)
+        if remainder:
+            integer += 1
+        if (integer > 2) & (len(wb.sheets) <= 2):  # integer:需要的表单数，len(wb.sheets) <= 2：当前只有一个表单
+            print(integer)
+            # 复制integer-1个新工作表
+            for i in range(1, integer):
+                new_name = '电子组件板EBOM（' + str(i+1) + '）'
+                sht.copy(name = new_name)
+        start = 0
+        stop = 18
+        step = 18
+        num = [a for a in range(1, length+1)]
+        for i in range(1, integer + 1):
+            print(i)
+            sht = wb.sheets[i]
+            sht.range('K4').options(transpose=True).value = wuliao_sc[start: stop]  # .options(transpose = True)
+            sht.range('B4').options(transpose = True).value = loction_num[start: stop]  #.options(transpose = True)
+            sht.range('P4').options(transpose = True).value = use_num[start: stop]  #.options(transpose = True)
+            for j in range(4, 22):
+                if sht.range('B' + str(j)).value:
+                    sht.range('Q' + str(j)).options(transpose = True).value = '只'
+            if i > 1:
+                sht.range('A4').options(transpose=True).value = num[start: stop]
+            start = stop
+            stop += step
+
+        wb.save()
+        wb.close()
+        app.quit()
+    finally:
+        app.kill()
+
 if __name__ == '__main__':
     root = Tk()
-    root.geometry('750x450+200+100')
+    root.geometry('750x500+200+100')
     # root.minsize(100,50)
     root.resizable(0, 0)
     root.title('物料查找')
-    # root.iconbitmap('D:\search\图标.ico')
+    # root.iconbitmap('图标.ico')
     app = gui.My_gui(master=root)
     root.mainloop()
+
+    # value = read_PBOM("ARCctrl_V0.1-PBOM.XLSX")
+    # write_PBOM_to_EBOM(value)
