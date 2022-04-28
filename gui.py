@@ -122,6 +122,7 @@ class My_gui(Frame):
         windnd.hook_dropfiles(self.entry_A002, func=self.dragged_A002)
         windnd.hook_dropfiles(self.entry_C016, func=self.dragged_C016)
         windnd.hook_dropfiles(self.entry_bom, func=self.dragged_bom)
+        windnd.hook_dropfiles(self.entry_PBOM, func=self.dragged_PBOM)
 
         self.value_to_index = {}  # 定义一个字典将右边listbox中的值对应到bom表中的索引
         self.list = []  # 定义一个列表存储匹配到的每一个物料
@@ -132,8 +133,17 @@ class My_gui(Frame):
 
     # 导出EBOM
     def ExportEBOM(self):
-        value = main.read_PBOM("ARCctrl_V0.1-PBOM.XLSX")
-        main.write_PBOM_to_EBOM(value)
+        # 获取EBOM地址
+        bom_dirname, bom_basename = os.path.split(self.entry_PBOM.get())
+        bom_basename_name, bom_basename_suffix = os.path.splitext(bom_basename)
+        bom_basename_name = re.sub(r'PBOM', 'EBOM', bom_basename_name)
+        EBOM_address = filedialog.asksaveasfilename(defaultextension='.xlsx',
+                                              filetypes=[('excel文件', '*.xlsx'), ('所有文件', '*.*')],
+                                              initialdir=bom_dirname,
+                                              initialfile=bom_basename_name + bom_basename_suffix)
+        value = main.read_PBOM(self.entry_PBOM.get())  # value:物料描述、位号的字典
+        print(EBOM_address)
+        main.write_PBOM_to_EBOM(value, EBOM_address)
 
     # 拖拽获取路径
     def dragged_A002(self, file):
@@ -401,7 +411,8 @@ class My_gui(Frame):
                 main.write_to_excel(save_path)
                 self.master.destroy()
         else:
-            self.warning('未完成匹配或无匹配项')
+            self.warning('未完成匹配')
+            return 0
 
     # 插入bom表检索出的数据
     def insert_bom(self, unsearched_index):

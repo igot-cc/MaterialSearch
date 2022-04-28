@@ -112,8 +112,11 @@ def read_PBOM(adress):
     #拿取物料描述
     nrows = sht.used_range.last_cell.row   # 获取总行数
     wuliao_sc = sht.range('D12:D' + str(nrows)).value   #获取物料描述列表
-    loction_num = sht.range('E12:E' + str(nrows)).value   #获取物料描述列表
-    use_num = sht.range('F12:F' + str(nrows)).value   #获取物料描述列表
+    for index in range(0, len(wuliao_sc)):
+        string = wuliao_sc[index]
+        wuliao_sc[index] = re.sub(r'/', r'_', str(string))
+    loction_num = sht.range('E12:E' + str(nrows)).value   #获取位号列表
+    use_num = sht.range('F12:F' + str(nrows)).value   #获取数量列表
     value = {'script': wuliao_sc, 'loction': loction_num, 'num': use_num}
 
     wb.close()
@@ -531,23 +534,24 @@ def write_to_excel(adress):
     # wb.close()
     # app.kill()
 
-def write_PBOM_to_EBOM(PBOM):
+def write_PBOM_to_EBOM(PBOM, address):
     wuliao_sc = PBOM['script']
     print(wuliao_sc)
     loction_num = PBOM['loction']
     use_num = PBOM['num']
     length = len(wuliao_sc)
 
-    new_EOM = 'new_EBOM.xlsx'
-    if not os.path.exists(new_EOM):
+    # new_EOM = 'new_EBOM.xlsx'
+    new_EBOM_address = address
+    if not os.path.exists(new_EBOM_address):
         try:
-            shutil.copyfile('EBOM_Template.XLSX', new_EOM)
+            shutil.copyfile('EBOM_Template.XLSX', new_EBOM_address)
         except:
             print('EBOM 建立失败')
             return None
 
     app = xw.App(visible=False, add_book=False)
-    wb = app.books.open(new_EOM)
+    wb = app.books.open(new_EBOM_address)
     print(wb.name)
     try:
         sht = wb.sheets['电子组件板EBOM（1）']  # 打开sheet
@@ -556,15 +560,11 @@ def write_PBOM_to_EBOM(PBOM):
         return None
 
     try:
-        # 计算需要几个sheet并新建到excel
-        integer = int(length / 18)
-        print(integer)
+        integer = int(length / 18)  # 计算需要几个sheet并新建到excel
         remainder = length % 18
-        print(remainder)
         if remainder:
             integer += 1
         if (integer > 2) & (len(wb.sheets) <= 2):  # integer:需要的表单数，len(wb.sheets) <= 2：当前只有一个表单
-            print(integer)
             # 复制integer-1个新工作表
             for i in range(1, integer):
                 new_name = '电子组件板EBOM（' + str(i+1) + '）'
@@ -572,21 +572,23 @@ def write_PBOM_to_EBOM(PBOM):
         start = 0
         stop = 18
         step = 18
-        num = [a for a in range(1, length+1)]
+        print("integer = " + str(integer))
         for i in range(1, integer + 1):
-            print(i)
+            print('第' + str(i) + '页')
             sht = wb.sheets[i]
             sht.range('K4').options(transpose=True).value = wuliao_sc[start: stop]  # .options(transpose = True)
-            sht.range('B4').options(transpose = True).value = loction_num[start: stop]  #.options(transpose = True)
-            sht.range('P4').options(transpose = True).value = use_num[start: stop]  #.options(transpose = True)
+            sht.range('B4').options(transpose=True).value = loction_num[start: stop]  #.options(transpose = True)
+            sht.range('P4').options(transpose=True).value = use_num[start: stop]  #.options(transpose = True)
             for j in range(4, 22):
                 if sht.range('B' + str(j)).value:
-                    sht.range('Q' + str(j)).options(transpose = True).value = '只'
-            if i > 1:
-                sht.range('A4').options(transpose=True).value = num[start: stop]
+                    sht.range('Q' + str(j)).options(transpose=True).value = '只'
+            num = [a for a in range((i-1)*18+1, i*18+1)]
+            sht.range('A4').options(transpose=True).value = num
+            sht.range('M30').value = '共   ' + str(integer) + '   页'
+            sht.range('M32').value = '第   ' + str(i) + '   页'
             start = stop
             stop += step
-
+        wb.sheets[1].activate()
         wb.save()
         wb.close()
         app.quit()
